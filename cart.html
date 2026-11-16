@@ -1,0 +1,499 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cart — Alibaaps</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .modal-backdrop { backdrop-filter: blur(4px); }
+    #checkout-modal { display: none; }
+    #checkout-modal.open { display: flex; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md fixed w-full top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex justify-between items-center h-16">
+        <a href="index.html" class="text-2xl font-bold text-blue-600">Alibaaps</a>
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="index.html" class="text-gray-700 hover:text-blue-600 transition">Home</a>
+          <a href="shop.html" class="text-gray-700 hover:text-blue-600 transition">Shop</a>
+          <a href="about.html" class="text-gray-700 hover:text-blue-600 transition">About</a>
+          <a href="contact.html" class="text-gray-700 hover:text-blue-600 transition">Contact</a>
+          <a href="cart.html" class="relative text-blue-600 font-semibold">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13L5.4 5M17 21a1 1 0 100-2 1 1 0 000 2zm-10 0a1 1 0 100-2 1 1 0 000 2z"/>
+            </svg>
+            <span id="cart-badge" class="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 items-center justify-center hidden">0</span>
+          </a>
+        </div>
+        <button id="menu-btn" class="md:hidden">
+          <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+      <a href="index.html" class="block px-6 py-3 hover:bg-gray-100">Home</a>
+      <a href="shop.html" class="block px-6 py-3 hover:bg-gray-100">Shop</a>
+      <a href="about.html" class="block px-6 py-3 hover:bg-gray-100">About</a>
+      <a href="contact.html" class="block px-6 py-3 hover:bg-gray-100">Contact</a>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto px-6 pt-28 pb-20">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Your Cart</h1>
+
+    <div id="cart-empty" class="hidden text-center py-24">
+      <div class="flex justify-center mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13L5.4 5M17 21a1 1 0 100-2 1 1 0 000 2zm-10 0a1 1 0 100-2 1 1 0 000 2z"/>
+        </svg>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-700 mb-3">Your cart is empty</h2>
+      <p class="text-gray-500 mb-8">Looks like you haven't added anything yet.</p>
+      <a href="shop.html" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition font-semibold">Start Shopping</a>
+    </div>
+
+    <div id="cart-content" class="flex flex-col lg:flex-row gap-8">
+      <div class="flex-1" id="cart-items-container"></div>
+      <div class="lg:w-80 shrink-0">
+        <div class="bg-white rounded-2xl shadow-sm p-6 sticky top-24">
+          <h2 class="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
+          <div class="space-y-3 text-sm text-gray-600 mb-6">
+            <div class="flex justify-between">
+              <span>Subtotal</span>
+              <span id="summary-subtotal" class="font-semibold text-gray-900">₦0</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Shipping</span>
+              <span class="text-green-600 font-medium">Calculated at checkout</span>
+            </div>
+          </div>
+          <div class="border-t pt-4 flex justify-between font-bold text-lg text-gray-900 mb-6">
+            <span>Total</span>
+            <span id="summary-total" class="text-blue-600">₦0</span>
+          </div>
+          <button onclick="openCheckout()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold hover:bg-blue-700 transition text-base">
+            Proceed to Checkout
+          </button>
+          <a href="shop.html" class="block text-center text-sm text-blue-600 hover:underline mt-4">Continue Shopping</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-gray-900 text-gray-300 mt-10">
+    <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+      <p>© 2026 Alibaaps. All Rights Reserved.</p>
+      <div class="flex space-x-6 mt-4 md:mt-0">
+        <a href="#" class="hover:text-white">Terms</a>
+        <a href="#" class="hover:text-white">Privacy</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- CHECKOUT MODAL -->
+  <div id="checkout-modal" class="fixed inset-0 z-50 items-center justify-center modal-backdrop bg-black/50">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[92vh] overflow-y-auto">
+
+      <div class="flex items-center justify-between p-6 border-b">
+        <div>
+          <h2 class="text-xl font-bold text-gray-900">Checkout</h2>
+          <p class="text-sm text-gray-400 mt-0.5">Fill in your details to complete your order.</p>
+        </div>
+        <button onclick="closeCheckout()" class="text-gray-400 hover:text-gray-700 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div id="checkout-form-wrap" class="p-6 space-y-6">
+
+        <!-- Step indicator -->
+        <div class="flex items-center gap-2 text-xs font-semibold">
+          <div id="step-1-ind" class="flex items-center gap-1.5 text-blue-600">
+            <span id="step-1-bubble" class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">1</span>
+            Details
+          </div>
+          <div class="flex-1 h-px bg-gray-200"></div>
+          <div id="step-2-ind" class="flex items-center gap-1.5 text-gray-400">
+            <span id="step-2-bubble" class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs">2</span>
+            Payment
+          </div>
+        </div>
+
+        <!-- Step 1: Details -->
+        <div id="step-1">
+          <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide mb-4">Personal Information</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">First Name <span class="text-red-500">*</span></label>
+              <input id="co-firstname" type="text" placeholder="John" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Last Name <span class="text-red-500">*</span></label>
+              <input id="co-lastname" type="text" placeholder="Doe" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Phone <span class="text-red-500">*</span></label>
+              <input id="co-phone" type="tel" placeholder="+234 801 234 5678" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email <span class="text-red-500">*</span></label>
+              <input id="co-email" type="email" placeholder="john@email.com" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            </div>
+          </div>
+
+          <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide mb-4">Delivery Address</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Street Address <span class="text-red-500">*</span></label>
+              <input id="co-address" type="text" placeholder="12 Wuse Road, Zone 4" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1.5">City <span class="text-red-500">*</span></label>
+                <input id="co-city" type="text" placeholder="Abuja" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1.5">State <span class="text-red-500">*</span></label>
+                <select id="co-state" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                  <option value="">Select state</option>
+                  <option>Abia</option><option>Adamawa</option><option>Akwa Ibom</option><option>Anambra</option>
+                  <option>Bauchi</option><option>Bayelsa</option><option>Benue</option><option>Borno</option>
+                  <option>Cross River</option><option>Delta</option><option>Ebonyi</option><option>Edo</option>
+                  <option>Ekiti</option><option>Enugu</option><option>FCT — Abuja</option><option>Gombe</option>
+                  <option>Imo</option><option>Jigawa</option><option>Kaduna</option><option>Kano</option>
+                  <option>Katsina</option><option>Kebbi</option><option>Kogi</option><option>Kwara</option>
+                  <option>Lagos</option><option>Nasarawa</option><option>Niger</option><option>Ogun</option>
+                  <option>Ondo</option><option>Osun</option><option>Oyo</option><option>Plateau</option>
+                  <option>Rivers</option><option>Sokoto</option><option>Taraba</option><option>Yobe</option>
+                  <option>Zamfara</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Delivery Note</label>
+              <textarea id="co-note" rows="2" placeholder="Landmark, gate colour, instructions for the rider..." class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+            </div>
+          </div>
+
+          <p id="co-error-1" class="hidden text-red-500 text-sm bg-red-50 border border-red-200 rounded-lg px-4 py-3 mt-4"></p>
+
+          <button onclick="goToPayment()" class="mt-6 w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition">
+            Continue to Payment →
+          </button>
+        </div>
+
+        <!-- Step 2: Payment (Paystack only) -->
+        <div id="step-2" class="hidden">
+
+          <!-- Order summary mini -->
+          <div class="bg-gray-50 rounded-xl p-4 mb-6">
+            <h3 class="text-sm font-bold text-gray-700 mb-3">Order Summary</h3>
+            <div id="co-items-list" class="space-y-2 text-sm text-gray-600"></div>
+            <div class="border-t border-gray-200 mt-3 pt-3 flex justify-between font-bold text-gray-900">
+              <span>Total</span>
+              <span id="co-total" class="text-blue-600">₦0</span>
+            </div>
+          </div>
+
+          <!-- Paystack payment box -->
+          <div class="border-2 border-blue-600 bg-blue-50 rounded-2xl p-5 mb-6">
+            <div class="flex items-center gap-3 mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+              </svg>
+              <span class="font-bold text-blue-800 text-sm">Secure Online Payment via Paystack</span>
+            </div>
+            <p class="text-xs text-blue-700 mb-3">Pay with card, bank transfer, USSD or mobile money. Your details are encrypted and never stored on our servers.</p>
+            <div class="flex gap-2 text-xs text-blue-600 font-medium">
+              <span class="bg-white border border-blue-200 rounded px-2 py-1">Visa</span>
+              <span class="bg-white border border-blue-200 rounded px-2 py-1">Mastercard</span>
+              <span class="bg-white border border-blue-200 rounded px-2 py-1">Bank Transfer</span>
+              <span class="bg-white border border-blue-200 rounded px-2 py-1">USSD</span>
+            </div>
+          </div>
+
+          <p id="co-error-2" class="hidden text-red-500 text-sm bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-4"></p>
+
+          <div class="flex gap-3">
+            <button onclick="backToDetails()" class="border border-gray-200 text-gray-600 px-6 py-3 rounded-xl font-semibold hover:bg-gray-50 transition">← Back</button>
+            <button onclick="submitOrder()" id="submit-btn" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition text-base">
+              Pay ₦<span id="pay-amount">0</span> with Paystack
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="cart.js"></script>
+  <!-- Paystack -->
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+
+  <script>
+    // ── Mobile menu ──────────────────────────────────────────────────────
+    document.getElementById('menu-btn').addEventListener('click', function() {
+      var mm   = document.getElementById('mobile-menu');
+      var mi   = document.getElementById('menu-icon');
+      var open = !mm.classList.contains('hidden');
+      mm.classList.toggle('hidden');
+      mi.innerHTML = open
+        ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>'
+        : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
+    });
+
+    // ── Cart rendering ───────────────────────────────────────────────────
+    function renderCart() {
+      var cart      = getCart();
+      var container = document.getElementById('cart-items-container');
+      var emptyMsg  = document.getElementById('cart-empty');
+      var content   = document.getElementById('cart-content');
+
+      if (!cart.length) {
+        emptyMsg.classList.remove('hidden');
+        content.classList.add('hidden');
+        return;
+      }
+      emptyMsg.classList.add('hidden');
+      content.classList.remove('hidden');
+
+      container.innerHTML = cart.map(function(item) {
+        var pid  = item.productId;
+        var pidAttr = typeof pid === 'string' ? "'" + pid + "'" : pid;
+        var size = item.size;
+        return '<div class="bg-white rounded-2xl shadow-sm p-5 mb-4 flex gap-5 items-start">' +
+          '<img src="' + (item.image || '') + '" alt="' + item.name + '" class="w-24 h-24 object-cover rounded-xl shrink-0 bg-gray-100"/>' +
+          '<div class="flex-1 min-w-0">' +
+            '<h3 class="font-semibold text-gray-900 text-lg truncate">' + item.name + '</h3>' +
+            '<p class="text-sm text-gray-500 mb-3">Size: EU ' + size + '</p>' +
+            '<div class="flex items-center justify-between flex-wrap gap-3">' +
+              '<div class="flex items-center gap-2 border border-gray-200 rounded-lg overflow-hidden">' +
+                '<button onclick="changeQty(' + pidAttr + ',\'' + size + '\',-1)" class="px-3 py-2 text-gray-600 hover:bg-gray-100 font-bold text-lg leading-none">−</button>' +
+                '<span class="px-3 py-2 font-semibold text-gray-800 min-w-[2rem] text-center">' + item.quantity + '</span>' +
+                '<button onclick="changeQty(' + pidAttr + ',\'' + size + '\',1)"  class="px-3 py-2 text-gray-600 hover:bg-gray-100 font-bold text-lg leading-none">+</button>' +
+              '</div>' +
+              '<span class="font-bold text-blue-600 text-lg">₦' + (item.price * item.quantity).toLocaleString() + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<button onclick="handleRemove(' + pidAttr + ',\'' + size + '\')" class="text-gray-300 hover:text-red-500 transition shrink-0 mt-1">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>' +
+          '</button>' +
+        '</div>';
+      }).join('');
+
+      var total = getCartTotal();
+      document.getElementById('summary-subtotal').textContent = '₦' + total.toLocaleString();
+      document.getElementById('summary-total').textContent    = '₦' + total.toLocaleString();
+    }
+
+    function changeQty(productId, size, delta) { updateQuantity(productId, size, delta); renderCart(); }
+    function handleRemove(productId, size)      { removeFromCart(productId, size); renderCart(); }
+
+    // Run on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      renderCart();
+    });
+
+    // ── Checkout modal ───────────────────────────────────────────────────
+    function openCheckout() {
+      if (!getCart().length) return;
+      showStep(1);
+      document.getElementById('checkout-form-wrap').style.display = 'block';
+      document.getElementById('co-error-1').classList.add('hidden');
+      document.getElementById('co-error-2').classList.add('hidden');
+      document.getElementById('checkout-modal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCheckout() {
+      document.getElementById('checkout-modal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('checkout-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeCheckout();
+    });
+
+    function showStep(n) {
+      document.getElementById('step-1').classList.toggle('hidden', n !== 1);
+      document.getElementById('step-2').classList.toggle('hidden', n !== 2);
+
+      var b1 = document.getElementById('step-1-bubble');
+      var b2 = document.getElementById('step-2-bubble');
+      var i1 = document.getElementById('step-1-ind');
+      var i2 = document.getElementById('step-2-ind');
+
+      if (n === 1) {
+        b1.className = 'w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs';
+        i1.className = 'flex items-center gap-1.5 text-blue-600';
+        b2.className = 'w-6 h-6 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs';
+        i2.className = 'flex items-center gap-1.5 text-gray-400';
+      } else {
+        b1.className = 'w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs';
+        i1.className = 'flex items-center gap-1.5 text-green-600';
+        b2.className = 'w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs';
+        i2.className = 'flex items-center gap-1.5 text-blue-600';
+
+        // Populate order summary and pay button
+        var cart  = getCart();
+        var total = getCartTotal();
+        document.getElementById('co-items-list').innerHTML = cart.map(function(i) {
+          return '<div class="flex justify-between"><span>' + i.name + ' × ' + i.quantity +
+            ' <span class="text-gray-400">(EU ' + i.size + ')</span></span>' +
+            '<span class="font-medium">₦' + (i.price * i.quantity).toLocaleString() + '</span></div>';
+        }).join('');
+        document.getElementById('co-total').textContent    = '₦' + total.toLocaleString();
+        document.getElementById('pay-amount').textContent  = total.toLocaleString();
+      }
+    }
+
+    function goToPayment() {
+      var fn  = document.getElementById('co-firstname').value.trim();
+      var ln  = document.getElementById('co-lastname').value.trim();
+      var ph  = document.getElementById('co-phone').value.trim();
+      var em  = document.getElementById('co-email').value.trim();
+      var ad  = document.getElementById('co-address').value.trim();
+      var ci  = document.getElementById('co-city').value.trim();
+      var st  = document.getElementById('co-state').value;
+      var err = document.getElementById('co-error-1');
+
+      if (!fn || !ln || !ph || !em || !ad || !ci || !st) {
+        err.textContent = 'Please fill in all required fields (marked *).';
+        err.classList.remove('hidden');
+        return;
+      }
+      if (!/\S+@\S+\.\S+/.test(em)) {
+        err.textContent = 'Please enter a valid email address.';
+        err.classList.remove('hidden');
+        return;
+      }
+      err.classList.add('hidden');
+      showStep(2);
+    }
+
+    function backToDetails() { showStep(1); }
+
+    // ── Submit order — Paystack popup ────────────────────────────────────
+    function submitOrder() {
+      var btn  = document.getElementById('submit-btn');
+      var err  = document.getElementById('co-error-2');
+      var cart = getCart();
+
+      if (!cart.length) {
+        err.textContent = 'Your cart is empty.';
+        err.classList.remove('hidden');
+        return;
+      }
+
+      var customer = {
+        firstname: document.getElementById('co-firstname').value.trim(),
+        lastname:  document.getElementById('co-lastname').value.trim(),
+        phone:     document.getElementById('co-phone').value.trim(),
+        email:     document.getElementById('co-email').value.trim()
+      };
+      var delivery = {
+        address: document.getElementById('co-address').value.trim(),
+        city:    document.getElementById('co-city').value.trim(),
+        state:   document.getElementById('co-state').value,
+        note:    document.getElementById('co-note').value.trim()
+      };
+
+      var total    = getCartTotal();
+      var orderId  = 'ORD-' + Date.now();
+
+      btn.textContent = 'Opening payment...';
+      btn.disabled    = true;
+
+      var handler = PaystackPop.setup({
+        key:      'pk_test_44d04d45dd489d56f27e97d52932053bcf26ec1c',
+        email:    customer.email,
+        amount:   total * 100,   // kobo
+        currency: 'NGN',
+        ref:      orderId,
+        metadata: {
+          order_id: orderId,
+          custom_fields: [
+            { display_name: 'Name',     variable_name: 'name',     value: customer.firstname + ' ' + customer.lastname },
+            { display_name: 'Phone',    variable_name: 'phone',    value: customer.phone },
+            { display_name: 'Address',  variable_name: 'address',  value: delivery.address + ', ' + delivery.city + ', ' + delivery.state }
+          ]
+        },
+        callback: function(response) {
+          // Payment confirmed by Paystack — save order to Supabase
+          saveOrderNow(orderId, customer, delivery, cart, total, response.reference);
+        },
+        onClose: function() {
+          btn.textContent = 'Pay ₦' + total.toLocaleString() + ' with Paystack';
+          btn.disabled    = false;
+        }
+      });
+
+      handler.openIframe();
+    }
+
+    // saveOrderNow is defined in the module script below and exposed to window
+  </script>
+
+  <!-- Supabase module — exposes saveOrderNow to window -->
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    // Inline Supabase client so this module is self-contained
+    const sb = createClient(
+      'https://nqhhtosbaneynohkzrnq.supabase.co',
+      'sb_publishable_ye41xi31ic0771AmJ60tvQ_XYd0X_o9',
+      { auth: { persistSession: false } }
+    );
+
+    window.saveOrderNow = async function(orderId, customer, delivery, cart, total, paystackRef) {
+      var btn = document.getElementById('submit-btn');
+      var err = document.getElementById('co-error-2');
+      btn.textContent = 'Saving order...';
+
+      var payload = {
+        id:           orderId,
+        customer:     customer,
+        delivery:     delivery,
+        items:        cart,
+        total:        total,
+        payment:      'paystack',
+        paystack_ref: paystackRef,
+        status:       'Pending'
+      };
+
+      var result = await sb.from('orders').insert([payload]);
+
+      if (result.error) {
+        console.error('Order save error:', result.error);
+        err.textContent = 'Payment received but order save failed: ' + result.error.message + '. Please screenshot your Paystack ref: ' + paystackRef;
+        err.classList.remove('hidden');
+        btn.textContent = 'Retry Save';
+        btn.disabled    = false;
+        return;
+      }
+
+      // Clear cart
+      clearCart();
+      updateCartBadge();
+
+      // Close modal and redirect to tracking page
+      document.getElementById('checkout-modal').classList.remove('open');
+      document.body.style.overflow = '';
+      window.location.href = 'order-status.html?order=' + orderId + '&ref=' + paystackRef;
+    };
+  </script>
+
+</body>
+</html>

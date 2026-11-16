@@ -1,0 +1,430 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product — Alibaaps</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .size-btn.selected { background-color: #2563eb; color: #fff; border-color: #2563eb; }
+    .size-btn:disabled { opacity: 0.35; cursor: not-allowed; text-decoration: line-through; }
+    .thumb-img { cursor: pointer; border: 2px solid transparent; transition: border-color .2s; }
+    .thumb-img.active { border-color: #2563eb; }
+    .modal-backdrop { backdrop-filter: blur(4px); }
+    #toast { transition: opacity .4s ease, transform .4s ease; }
+    #toast.show { opacity: 1 !important; transform: translateY(0) !important; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md fixed w-full top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex justify-between items-center h-16">
+        <a href="index.html" class="text-2xl font-bold text-blue-600">Alibaaps</a>
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="index.html" class="text-gray-700 hover:text-blue-600 transition">Home</a>
+          <a href="shop.html" class="text-gray-700 hover:text-blue-600 transition">Shop</a>
+          <a href="about.html" class="text-gray-700 hover:text-blue-600 transition">About</a>
+          <a href="contact.html" class="text-gray-700 hover:text-blue-600 transition">Contact</a>
+          <a href="order-status.html" class="text-gray-700 hover:text-blue-600 transition">Track Order</a>
+          <a href="cart.html" class="relative text-gray-700 hover:text-blue-600 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13L5.4 5M17 21a1 1 0 100-2 1 1 0 000 2zm-10 0a1 1 0 100-2 1 1 0 000 2z"/>
+            </svg>
+            <span id="cart-badge" class="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 items-center justify-center hidden">0</span>
+          </a>
+        </div>
+        <button id="menu-btn" class="md:hidden">
+          <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+      <a href="index.html" class="block px-6 py-3 hover:bg-gray-100">Home</a>
+      <a href="shop.html" class="block px-6 py-3 hover:bg-gray-100">Shop</a>
+      <a href="about.html" class="block px-6 py-3 hover:bg-gray-100">About</a>
+      <a href="contact.html" class="block px-6 py-3 hover:bg-gray-100">Contact</a>
+      <a href="order-status.html" class="block px-6 py-3 hover:bg-gray-100">Track Order</a>
+      <a href="cart.html" class="block px-6 py-3 hover:bg-gray-100">Cart</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-6 pt-28 pb-20" id="product-content">
+    <div class="text-center py-20 text-gray-400 text-lg" id="loading-msg">Loading product...</div>
+  </main>
+
+  <!-- Size Guide Modal -->
+  <div id="size-guide-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop bg-black/50">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center p-6 border-b">
+        <h2 class="text-2xl font-bold text-gray-800">Size Guide</h2>
+        <button onclick="closeModal('size-guide-modal')" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none">&times;</button>
+      </div>
+      <div class="p-6">
+        <p class="text-gray-500 mb-6 text-sm">Measure your foot length from heel to tip of longest toe while standing.</p>
+        <h3 class="font-semibold text-gray-700 mb-3">Men's Size Chart</h3>
+        <div class="overflow-x-auto mb-8">
+          <table class="w-full text-sm text-left border-collapse">
+            <thead><tr class="bg-blue-600 text-white">
+              <th class="px-4 py-3 rounded-tl-lg">EU</th><th class="px-4 py-3">US Men</th><th class="px-4 py-3">UK</th><th class="px-4 py-3 rounded-tr-lg">Foot (cm)</th>
+            </tr></thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr class="hover:bg-gray-50"><td class="px-4 py-2">39</td><td class="px-4 py-2">6.5</td><td class="px-4 py-2">6</td><td class="px-4 py-2">24.5</td></tr>
+              <tr class="hover:bg-gray-50"><td class="px-4 py-2">40</td><td class="px-4 py-2">7</td><td class="px-4 py-2">6.5</td><td class="px-4 py-2">25.1</td></tr>
+              <tr class="hover:bg-gray-50"><td class="px-4 py-2">41</td><td class="px-4 py-2">8</td><td class="px-4 py-2">7.5</td><td class="px-4 py-2">25.7</td></tr>
+              <tr class="hover:bg-gray-50"><td class="px-4 py-2">42</td><td class="px-4 py-2">8.5</td><td class="px-4 py-2">8</td><td class="px-4 py-2">26.0</td></tr>
+              <tr class="hover:bg-gray-50"><td class="px-4 py-2">43</td><td class="px-4 py-2">9.5</td><td class="px-4 py-2">9</td><td class="px-4 py-2">27.0</td></tr>
+              <tr class="hover:bg-gray-50"><td class="px-4 py-2">44</td><td class="px-4 py-2">10</td><td class="px-4 py-2">9.5</td><td class="px-4 py-2">27.3</td></tr>
+              <tr class="hover:bg-gray-50"><td class="px-4 py-2">45</td><td class="px-4 py-2">11</td><td class="px-4 py-2">10.5</td><td class="px-4 py-2">28.3</td></tr>
+              <tr class="hover:bg-gray-50"><td class="px-4 py-2">46</td><td class="px-4 py-2">11.5</td><td class="px-4 py-2">11</td><td class="px-4 py-2">28.6</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 class="font-semibold text-gray-700 mb-3">Women's Size Chart</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left border-collapse">
+            <thead><tr class="bg-blue-600 text-white">
+              <th class="px-4 py-3 rounded-tl-lg">EU</th><th class="px-4 py-3">US Women</th><th class="px-4 py-3">UK</th><th class="px-4 py-3 rounded-tr-lg">Foot (cm)</th>
+            </tr></thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr class="hover:bg-gray-50"><td class="px-4 py-2">36</td><td class="px-4 py-2">5.5</td><td class="px-4 py-2">3.5</td><td class="px-4 py-2">22.5</td></tr>
+              <tr class="hover:bg-gray-50"><td class="px-4 py-2">37</td><td class="px-4 py-2">6.5</td><td class="px-4 py-2">4.5</td><td class="px-4 py-2">23.5</td></tr>
+              <tr class="hover:bg-gray-50"><td class="px-4 py-2">38</td><td class="px-4 py-2">7.5</td><td class="px-4 py-2">5.5</td><td class="px-4 py-2">24.1</td></tr>
+              <tr class="hover:bg-gray-50"><td class="px-4 py-2">39</td><td class="px-4 py-2">8.5</td><td class="px-4 py-2">6.5</td><td class="px-4 py-2">25.1</td></tr>
+              <tr class="hover:bg-gray-50"><td class="px-4 py-2">40</td><td class="px-4 py-2">9.5</td><td class="px-4 py-2">7.5</td><td class="px-4 py-2">25.7</td></tr>
+              <tr class="hover:bg-gray-50"><td class="px-4 py-2">41</td><td class="px-4 py-2">10.5</td><td class="px-4 py-2">8.5</td><td class="px-4 py-2">26.7</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-6 p-4 bg-blue-50 rounded-xl text-sm text-blue-800">
+          <strong>How to measure:</strong> Stand on a flat surface, heel against a wall. Measure from wall to tip of your longest toe in centimetres.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Size Recommendation Modal -->
+  <div id="size-rec-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop bg-black/50">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center p-6 border-b">
+        <h2 class="text-2xl font-bold text-gray-800">Size Recommendation</h2>
+        <button onclick="closeModal('size-rec-modal')" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none">&times;</button>
+      </div>
+      <div class="p-6">
+        <p class="text-gray-500 text-sm mb-6">Enter your measurements and we'll recommend the best size.</p>
+        <form id="rec-form" class="space-y-5" onsubmit="submitSizeRec(event)">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Gender</label>
+            <div class="flex gap-4">
+              <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gender" value="male" class="accent-blue-600" checked><span>Male</span></label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="gender" value="female" class="accent-blue-600"><span>Female</span></label>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Foot Length (cm) <span class="text-red-500">*</span></label>
+            <input id="foot-length" type="number" step="0.1" min="20" max="35" placeholder="e.g. 26.5"
+              class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            <p class="text-xs text-gray-400 mt-1">Measure heel to longest toe while standing.</p>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Foot Width</label>
+            <div class="flex gap-4 flex-wrap">
+              <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="foot-width" value="narrow" class="accent-blue-600"><span>Narrow</span></label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="foot-width" value="medium" class="accent-blue-600" checked><span>Medium</span></label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="foot-width" value="wide" class="accent-blue-600"><span>Wide</span></label>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Height (cm) <span class="text-gray-400 font-normal">— optional</span></label>
+            <input id="height" type="number" placeholder="e.g. 175" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Weight (kg) <span class="text-gray-400 font-normal">— optional</span></label>
+            <input id="weight" type="number" placeholder="e.g. 70" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+          </div>
+          <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">Find My Size</button>
+        </form>
+        <div id="rec-result" class="hidden mt-6 p-5 bg-blue-50 rounded-xl border border-blue-200">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <h3 class="font-semibold text-gray-800 text-lg">Your Recommended Size</h3>
+          </div>
+          <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="bg-white rounded-lg p-3 text-center shadow-sm">
+              <p class="text-xs text-gray-500 uppercase tracking-wide">EU Size</p>
+              <p class="text-2xl font-bold text-blue-600" id="result-eu">—</p>
+            </div>
+            <div class="bg-white rounded-lg p-3 text-center shadow-sm">
+              <p class="text-xs text-gray-500 uppercase tracking-wide">US Size</p>
+              <p class="text-2xl font-bold text-blue-600" id="result-us">—</p>
+            </div>
+          </div>
+          <p class="text-sm text-gray-600" id="result-note"></p>
+        </div>
+        <div id="rec-error" class="hidden mt-4 p-4 bg-red-50 rounded-xl border border-red-200 text-red-700 text-sm"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-blue-600 text-white px-5 py-3 rounded-xl shadow-xl z-50 opacity-0 translate-y-4 pointer-events-none text-sm font-medium flex items-center gap-2">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+    Added to cart!
+  </div>
+
+  <!-- Load non-module scripts first so their globals are ready -->
+  <script src="products.js"></script>
+  <script src="cart.js"></script>
+  <script src="size-recommend.js"></script>
+
+  <!-- All globals defined here — no module scope issues -->
+  <script>
+    // ── State ────────────────────────────────────────────────────────────
+    var currentProduct  = null;
+    var selectedSize    = null;
+    var selectedColour  = null;
+
+    // ── Mobile menu ──────────────────────────────────────────────────────
+    document.getElementById('menu-btn').addEventListener('click', function() {
+      var mm = document.getElementById('mobile-menu');
+      var mi = document.getElementById('menu-icon');
+      var open = mm.classList.toggle('hidden');
+      mi.innerHTML = !open
+        ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>'
+        : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>';
+    });
+
+    // ── Modal ────────────────────────────────────────────────────────────
+    function openModal(id) {
+      var el = document.getElementById(id);
+      el.classList.remove('hidden');
+      el.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) {
+      var el = document.getElementById(id);
+      el.classList.add('hidden');
+      el.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+    ['size-guide-modal','size-rec-modal'].forEach(function(id) {
+      document.getElementById(id).addEventListener('click', function(e) {
+        if (e.target === this) closeModal(id);
+      });
+    });
+
+    // ── Toast ────────────────────────────────────────────────────────────
+    function showToast() {
+      var t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(function() { t.classList.remove('show'); }, 2800);
+    }
+
+    // ── Thumbnail swap ───────────────────────────────────────────────────
+    function setMainImage(src, el) {
+      document.getElementById('main-image').src = src;
+      document.querySelectorAll('.thumb-img').forEach(function(t) { t.classList.remove('active'); });
+      el.classList.add('active');
+    }
+
+    // ── Colour select ────────────────────────────────────────────────────
+    function selectColour(btn, label) {
+      document.querySelectorAll('.colour-opt').forEach(function(b) {
+        b.classList.remove('ring-2','ring-offset-1','ring-blue-600');
+        b.style.borderColor = 'transparent';
+      });
+      btn.classList.add('ring-2','ring-offset-1','ring-blue-600');
+      btn.style.borderColor = '#2563eb';
+      var lbl = document.getElementById('colour-label');
+      if (lbl) lbl.textContent = label;
+      selectedColour = label;
+    }
+
+    // ── Size select ──────────────────────────────────────────────────────
+    function selectSize(btn) {
+      if (btn.disabled) return;
+      document.querySelectorAll('.size-btn').forEach(function(b) { b.classList.remove('selected'); });
+      btn.classList.add('selected');
+      selectedSize = btn.dataset.size;
+      document.getElementById('size-error').classList.add('hidden');
+    }
+
+    // ── Add to cart ──────────────────────────────────────────────────────
+    function handleAddToCart() {
+      if (!selectedSize) {
+        document.getElementById('size-error').classList.remove('hidden');
+        return;
+      }
+      var p = currentProduct;
+      var colour = selectedColour || (p.colours && p.colours.length ? p.colours[0].label : '');
+      addToCart(p.id, selectedSize, p.name, Number(p.price), p.images[0], colour);
+      showToast();
+    }
+
+    // ── Buy now ──────────────────────────────────────────────────────────
+    function handleBuyNow() {
+      if (!selectedSize) {
+        document.getElementById('size-error').classList.remove('hidden');
+        return;
+      }
+      var p = currentProduct;
+      var colour = selectedColour || (p.colours && p.colours.length ? p.colours[0].label : '');
+      addToCart(p.id, selectedSize, p.name, Number(p.price), p.images[0], colour);
+      window.location.href = 'cart.html';
+    }
+
+    // ── Size recommendation form ─────────────────────────────────────────
+    function submitSizeRec(e) {
+      e.preventDefault();
+      var gender    = document.querySelector('input[name="gender"]:checked').value;
+      var footLen   = document.getElementById('foot-length').value;
+      var footWidth = document.querySelector('input[name="foot-width"]:checked').value;
+      var result    = window.recommendSize(gender, footLen, footWidth);
+      document.getElementById('rec-result').classList.add('hidden');
+      document.getElementById('rec-error').classList.add('hidden');
+      if (result.error) {
+        document.getElementById('rec-error').textContent = result.error;
+        document.getElementById('rec-error').classList.remove('hidden');
+        return;
+      }
+      document.getElementById('result-eu').textContent  = result.euSize;
+      document.getElementById('result-us').textContent  = result.usSize;
+      document.getElementById('result-note').textContent = result.widthNote;
+      document.getElementById('rec-result').classList.remove('hidden');
+    }
+
+    // ── Render product ───────────────────────────────────────────────────
+    function renderProduct(p) {
+      currentProduct = p;
+      selectedColour = (p.colours && p.colours.length) ? p.colours[0].label : '';
+      document.title = p.name + ' — Alibaaps';
+
+      var thumbsHTML = '';
+      if (p.images.length > 1) {
+        thumbsHTML = '<div class="flex flex-col gap-3 w-20 shrink-0">' +
+          p.images.map(function(src, i) {
+            return '<img src="' + src + '" alt="' + p.name + '" class="thumb-img w-20 h-20 object-cover rounded-lg ' + (i===0?'active':'') + '" onclick="setMainImage(\'' + src.replace(/'/g,"\\'") + '\',this)"/>';
+          }).join('') +
+        '</div>';
+      }
+
+      var sizesHTML = (p.sizes || []).map(function(s) {
+        var dis = s.stock === 0;
+        return '<button class="size-btn border-2 border-gray-300 rounded-lg px-4 py-2 text-sm font-medium hover:border-blue-600 transition ' +
+          (dis ? 'opacity-40 line-through cursor-not-allowed' : 'cursor-pointer') + '" ' +
+          'data-size="' + s.size + '" ' +
+          (dis ? 'disabled' : '') +
+          ' onclick="selectSize(this)">' + s.size + '</button>';
+      }).join('');
+
+      var coloursHTML = '';
+      if (p.colours && p.colours.length) {
+        coloursHTML = '<div class="mb-5"><span class="text-sm font-semibold text-gray-700 block mb-2">Colour</span>' +
+          '<div class="flex gap-2 flex-wrap">' +
+          p.colours.map(function(c, i) {
+            var r=parseInt(c.hex.slice(1,3),16), g=parseInt(c.hex.slice(3,5),16), b=parseInt(c.hex.slice(5,7),16);
+            var light = (r*299+g*587+b*114)/1000 > 180;
+            return '<button type="button" class="colour-opt w-8 h-8 rounded-full border-2 transition ' +
+              (i===0 ? 'border-blue-600 ring-2 ring-offset-1 ring-blue-600' : 'border-transparent hover:border-gray-400') + '" ' +
+              'style="background:' + c.hex + ';' + (light?'border-color:#d1d5db;':'') + '" ' +
+              'title="' + c.label + '" onclick="selectColour(this,\'' + c.label + '\')"></button>';
+          }).join('') +
+          '</div><p class="text-xs text-gray-400 mt-1" id="colour-label">' + p.colours[0].label + '</p></div>';
+      }
+
+      var firstImg = (p.images && p.images[0]) ? p.images[0] : 'https://placehold.co/600x600/e5e7eb/9ca3af?text=No+Image';
+
+      document.getElementById('product-content').innerHTML =
+        '<div class="mb-6"><a href="shop.html" class="text-blue-600 hover:underline text-sm">← Back to Shop</a></div>' +
+        '<div class="flex flex-col md:flex-row gap-10">' +
+
+          // Left images
+          '<div class="md:w-1/2 flex gap-4">' +
+            thumbsHTML +
+            '<div class="flex-1"><img id="main-image" src="' + firstImg + '" alt="' + p.name + '" class="w-full object-cover rounded-2xl shadow-md" style="aspect-ratio:1/1;max-height:520px;"/></div>' +
+          '</div>' +
+
+          // Right details
+          '<div class="md:w-1/2 flex flex-col justify-start">' +
+            '<span class="text-xs uppercase tracking-widest text-blue-600 font-semibold mb-2">' + p.category + '</span>' +
+            '<h1 class="text-3xl font-bold text-gray-900 mb-2">' + p.name + '</h1>' +
+            '<p class="text-3xl font-bold text-blue-600 mb-4">₦' + Number(p.price).toLocaleString() + '</p>' +
+            '<p class="text-gray-600 mb-6 leading-relaxed">' + p.description + '</p>' +
+
+            coloursHTML +
+
+            '<div class="mb-6">' +
+              '<div class="flex items-center justify-between mb-3">' +
+                '<span class="text-sm font-semibold text-gray-700">Select Size (EU)</span>' +
+                '<div class="flex gap-3">' +
+                  '<button onclick="openModal(\'size-guide-modal\')" class="flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-medium transition">' +
+                    '<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>' +
+                    'Size Guide</button>' +
+                  '<button onclick="openModal(\'size-rec-modal\')" class="flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-medium transition">' +
+                    '<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>' +
+                    'Size Recommendation</button>' +
+                '</div>' +
+              '</div>' +
+              '<div class="flex flex-wrap gap-2">' + sizesHTML + '</div>' +
+              '<p id="size-error" class="text-red-500 text-xs mt-2 hidden">Please select a size first.</p>' +
+            '</div>' +
+
+            '<div class="flex flex-col sm:flex-row gap-3">' +
+              '<button onclick="handleAddToCart()" class="flex-1 border-2 border-blue-600 text-blue-600 font-semibold py-3 rounded-xl hover:bg-blue-50 transition">Add to Cart</button>' +
+              '<button onclick="handleBuyNow()" class="flex-1 bg-blue-600 text-white font-semibold py-3 rounded-xl hover:bg-blue-700 transition">Buy Now</button>' +
+            '</div>' +
+
+            '<div class="flex gap-6 mt-8 text-xs text-gray-400">' +
+              '<span class="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>Secure checkout</span>' +
+              '<span class="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>Fast delivery</span>' +
+              '<span class="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>Handcrafted quality</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+
+      var lm = document.getElementById('loading-msg');
+      if (lm) lm.remove();
+    }
+
+    // ── Load product (async via module, then call renderProduct) ─────────
+    // Rendered by the module script below after fetching
+  </script>
+
+  <!-- Module only used for Supabase fetch, then calls global renderProduct -->
+  <script type="module">
+    import { getProductById } from './supabase.js';
+
+    var params    = new URLSearchParams(window.location.search);
+    var productId = params.get('id');
+    var product   = null;
+
+    if (productId && productId.startsWith('local-')) {
+      product = MOCK_PRODUCTS.find(function(p) { return p.id === productId; }) || null;
+    } else if (productId) {
+      product = await getProductById(productId);
+    }
+
+    if (!product) {
+      document.getElementById('product-content').innerHTML =
+        '<div class="text-center py-32">' +
+        '<div class="flex justify-center mb-6"><svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>' +
+        '<h2 class="text-2xl font-bold text-gray-700 mb-3">Product not found</h2>' +
+        '<p class="text-gray-500 mb-8">The product you\'re looking for doesn\'t exist.</p>' +
+        '<a href="shop.html" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition font-semibold">Browse Shop</a></div>';
+      var lm = document.getElementById('loading-msg');
+      if (lm) lm.remove();
+    } else {
+      renderProduct(product);
+    }
+  </script>
+</body>
+</html>

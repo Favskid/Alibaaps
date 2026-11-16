@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Track Order — Alibaaps</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .step-done  .dot { background: #2563eb; }
+    .step-done  .label { color: #1e40af; font-weight: 600; }
+    .step-done  .line { background: #2563eb; }
+    .step-active .dot { background: #2563eb; box-shadow: 0 0 0 4px #bfdbfe; }
+    .step-active .label { color: #1e40af; font-weight: 700; }
+    .step-pending .dot { background: #e5e7eb; }
+    .step-pending .label { color: #9ca3af; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md fixed w-full top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex justify-between items-center h-16">
+        <a href="index.html" class="text-2xl font-bold text-blue-600">Alibaaps</a>
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="index.html" class="text-gray-700 hover:text-blue-600 transition">Home</a>
+          <a href="shop.html" class="text-gray-700 hover:text-blue-600 transition">Shop</a>
+          <a href="about.html" class="text-gray-700 hover:text-blue-600 transition">About</a>
+          <a href="contact.html" class="text-gray-700 hover:text-blue-600 transition">Contact</a>
+          <a href="order-status.html" class="text-blue-600 font-semibold">Track Order</a>
+          <a href="cart.html" class="relative text-gray-700 hover:text-blue-600 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13L5.4 5M17 21a1 1 0 100-2 1 1 0 000 2zm-10 0a1 1 0 100-2 1 1 0 000 2z"/>
+            </svg>
+            <span id="cart-badge" class="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 items-center justify-center hidden">0</span>
+          </a>
+        </div>
+        <button id="menu-btn" class="md:hidden">
+          <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+      <a href="index.html" class="block px-6 py-3 hover:bg-gray-100">Home</a>
+      <a href="shop.html" class="block px-6 py-3 hover:bg-gray-100">Shop</a>
+      <a href="about.html" class="block px-6 py-3 hover:bg-gray-100">About</a>
+      <a href="contact.html" class="block px-6 py-3 hover:bg-gray-100">Contact</a>
+      <a href="order-status.html" class="block px-6 py-3 hover:bg-gray-100 font-semibold text-blue-600">Track Order</a>
+      <a href="cart.html" class="block px-6 py-3 hover:bg-gray-100">Cart</a>
+    </div>
+  </nav>
+
+  <main class="max-w-2xl mx-auto px-6 pt-32 pb-20">
+
+    <div class="text-center mb-10">
+      <h1 class="text-3xl font-bold text-gray-900">Track Your Order</h1>
+      <p class="text-gray-500 mt-2 text-sm">Enter your Order ID to see the current status of your delivery.</p>
+    </div>
+
+    <!-- Search box -->
+    <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+      <label class="block text-sm font-semibold text-gray-700 mb-2">Order ID</label>
+      <div class="flex gap-3">
+        <input id="order-input" type="text" placeholder="e.g. ORD-1794753193763"
+          class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+        <button onclick="lookupOrder()"
+          class="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition text-sm shrink-0">
+          Track
+        </button>
+      </div>
+      <p id="lookup-error" class="hidden text-red-500 text-xs mt-3">Order not found. Please check the ID and try again.</p>
+    </div>
+
+    <!-- Result (hidden until lookup) -->
+    <div id="result-wrap" class="hidden space-y-5">
+
+      <!-- Order details card -->
+      <div class="bg-white rounded-2xl shadow-sm p-6">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-1">Order ID</p>
+            <p class="font-bold text-gray-900 font-mono" id="res-id"></p>
+          </div>
+          <span id="res-status-badge" class="text-xs font-bold px-3 py-1.5 rounded-full"></span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          <div>
+            <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-1">Placed</p>
+            <p class="text-gray-700" id="res-date"></p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-1">Customer</p>
+            <p class="text-gray-700" id="res-customer"></p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-1">Delivery</p>
+            <p class="text-gray-700" id="res-delivery"></p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-1">Total</p>
+            <p class="font-bold text-blue-600" id="res-total"></p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-1">Payment Ref</p>
+            <p class="text-gray-700 font-mono text-xs" id="res-ref"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status timeline -->
+      <div class="bg-white rounded-2xl shadow-sm p-6">
+        <h2 class="font-bold text-gray-800 text-base mb-6">Order Status</h2>
+        <div class="relative pl-8" id="timeline">
+
+          <!-- Steps rendered by JS -->
+
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="bg-gray-900 text-gray-300">
+    <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+      <p>© 2026 Alibaaps. All Rights Reserved.</p>
+      <div class="flex space-x-6 mt-4 md:mt-0">
+        <a href="#" class="hover:text-white transition">Terms</a>
+        <a href="#" class="hover:text-white transition">Privacy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="cart.js"></script>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const sb = createClient(
+      'https://nqhhtosbaneynohkzrnq.supabase.co',
+      'sb_publishable_ye41xi31ic0771AmJ60tvQ_XYd0X_o9',
+      { auth: { persistSession: false } }
+    );
+
+    // Mobile menu
+    document.getElementById('menu-btn').addEventListener('click', function() {
+      var mm = document.getElementById('mobile-menu');
+      var mi = document.getElementById('menu-icon');
+      var open = !mm.classList.contains('hidden');
+      mm.classList.toggle('hidden');
+      mi.innerHTML = open
+        ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>'
+        : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
+    });
+
+    // Allow Enter key to trigger lookup
+    document.getElementById('order-input').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') window.lookupOrder();
+    });
+
+    const STATUS_ORDER = ['Pending', 'Processing', 'Shipped', 'Delivered'];
+
+    const STATUS_BADGE = {
+      'Pending':    'bg-amber-100 text-amber-700',
+      'Processing': 'bg-blue-100 text-blue-700',
+      'Shipped':    'bg-purple-100 text-purple-700',
+      'Delivered':  'bg-green-100 text-green-700',
+      'Cancelled':  'bg-red-100 text-red-700'
+    };
+
+    const STEPS = [
+      { key: 'Pending',    label: 'Order Placed',      desc: 'Payment confirmed and order received' },
+      { key: 'Processing', label: 'Processing',         desc: "We're preparing your order" },
+      { key: 'Shipped',    label: 'Out for Delivery',   desc: 'Your order is on the way' },
+      { key: 'Delivered',  label: 'Delivered',          desc: 'Order delivered successfully' }
+    ];
+
+    window.lookupOrder = async function() {
+      var id      = document.getElementById('order-input').value.trim();
+      var errEl   = document.getElementById('lookup-error');
+      var wrapper = document.getElementById('result-wrap');
+
+      if (!id) return;
+      errEl.classList.add('hidden');
+      wrapper.classList.add('hidden');
+
+      var { data, error } = await sb
+        .from('orders')
+        .select('id, status, created_at, customer, delivery, total, paystack_ref')
+        .eq('id', id)
+        .single();
+
+      if (error || !data) {
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      // Populate details
+      var date = new Date(data.created_at).toLocaleDateString('en-NG', {
+        day: 'numeric', month: 'long', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+
+      document.getElementById('res-id').textContent       = data.id;
+      document.getElementById('res-date').textContent     = date;
+      document.getElementById('res-customer').textContent = data.customer.firstname + ' ' + data.customer.lastname;
+      document.getElementById('res-delivery').textContent = data.delivery.address + ', ' + data.delivery.city + ', ' + data.delivery.state;
+      document.getElementById('res-total').textContent    = '₦' + Number(data.total).toLocaleString();
+      document.getElementById('res-ref').textContent      = data.paystack_ref || '—';
+
+      var badge     = document.getElementById('res-status-badge');
+      badge.textContent = data.status;
+      badge.className   = 'text-xs font-bold px-3 py-1.5 rounded-full ' + (STATUS_BADGE[data.status] || 'bg-gray-100 text-gray-600');
+
+      // Build timeline
+      var currentIdx = data.status === 'Cancelled'
+        ? -1
+        : STATUS_ORDER.indexOf(data.status);
+
+      var stepsToShow = data.status === 'Cancelled'
+        ? [{ key: 'Cancelled', label: 'Cancelled', desc: 'This order has been cancelled.' }]
+        : STEPS;
+
+      var timelineHTML = '';
+      stepsToShow.forEach(function(step, i) {
+        var isDone    = data.status !== 'Cancelled' && i < currentIdx;
+        var isActive  = data.status !== 'Cancelled' && i === currentIdx;
+        var isPending = data.status !== 'Cancelled' && i > currentIdx;
+        var isCancelled = data.status === 'Cancelled';
+
+        var dotColor   = isDone || isActive ? '#2563eb' : '#e5e7eb';
+        var dotShadow  = isActive ? 'box-shadow:0 0 0 4px #bfdbfe;' : '';
+        var labelColor = isDone || isActive ? '#1e40af' : '#9ca3af';
+        var labelWeight= isActive ? '700' : isDone ? '600' : '400';
+        var descColor  = isDone || isActive ? '#374151' : '#d1d5db';
+
+        // Line between steps
+        var lineColor = isDone ? '#2563eb' : '#e5e7eb';
+        var lineHTML  = i < stepsToShow.length - 1
+          ? '<div style="position:absolute;left:-1.25rem;top:2rem;width:2px;height:calc(100% + 1.5rem);background:' + lineColor + '"></div>'
+          : '';
+
+        // Check icon for done steps
+        var dotInner = isDone
+          ? '<svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>'
+          : isCancelled
+            ? '<svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>'
+            : '';
+
+        var dotBg = isCancelled ? '#ef4444' : dotColor;
+
+        timelineHTML +=
+          '<div class="relative pb-8 flex gap-4 items-start">' +
+            lineHTML +
+            '<div style="width:1.75rem;height:1.75rem;border-radius:9999px;background:' + dotBg + ';' + dotShadow + 'display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:10;">' +
+              dotInner +
+            '</div>' +
+            '<div class="pt-0.5">' +
+              '<p style="font-weight:' + labelWeight + ';color:' + labelColor + ';font-size:0.9rem;">' + step.label + '</p>' +
+              '<p style="font-size:0.78rem;color:' + descColor + ';margin-top:2px;">' + step.desc + '</p>' +
+            '</div>' +
+          '</div>';
+      });
+
+      document.getElementById('timeline').innerHTML = timelineHTML;
+      wrapper.classList.remove('hidden');
+      wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    // Auto-lookup if order ID in URL query param
+    var params = new URLSearchParams(window.location.search);
+    var qid    = params.get('order');
+    if (qid) {
+      document.getElementById('order-input').value = qid;
+      window.lookupOrder();
+    }
+  </script>
+</body>
+</html>
